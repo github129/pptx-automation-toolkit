@@ -1,0 +1,15 @@
+{
+  "name": "pptx-automation-toolkit",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Power Automate + Office Scripts で標準コネクタだけで PowerPoint を作るサンプル",
+  "scripts": {
+    "build:all-types": "node tools/build-local.js samples/all-types.json",
+    "build:simple": "node tools/build-local.js samples/simple-deck.json",
+    "build:sample": "node tools/build-local.js samples/sample-deck.json",
+    "build:table": "node tools/build-local.js --pptx samples/table-data.json 売上一覧"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  }
+}

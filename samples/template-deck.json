@@ -1,0 +1,36 @@
+{
+  "template": "/PowerPoint/templates/corporate.pptx",
+  "templateSlides": "remove",
+  "assets": [ { "name": "logo", "path": "/PowerPoint/images/logo.png" } ],
+  "output": { "folder": "/PowerPoint/output", "fileName": "提案書_{{customer}}_{timestamp}" },
+
+  "vars": { "customer": "株式会社サンプル", "date": "2026/10/27", "owner": "営業部 山田" },
+  "theme": { "colors": { "accent1": "C2410C" } },
+  "master": { "logo": { "image": "logo", "position": "bottomRight", "h": 0.8 } },
+  "slideNumber": true,
+
+  "slides": [
+    { "base": 1, "section": "表紙" },
+    { "base": 2, "replace": { "{{address}}": "東京都千代田区丸の内 1-1-1" }, "notes": "テンプレートの 2 枚目を複製して差し込み" },
+    {
+      "layout": "タイトルとコンテンツ", "section": "本編",
+      "title": "ご提案の背景",
+      "body": ["紙とExcelによる手作業が月 120 時間発生", ["転記ミスによる差し戻しが月 30 件", "締め処理が属人化"], "クラウド化で **工数 70% 削減** を目指す"]
+    },
+    {
+      "layout": "twoContent",
+      "title": "効果試算",
+      "left": { "type": "chart", "chartType": "line", "title": "月間工数（時間）", "categories": ["現状", "3か月後", "6か月後", "12か月後"], "series": [ { "name": "工数", "values": [120, 80, 50, 36] } ] },
+      "right": { "type": "table", "rows": [["項目", "現状", "導入後"], ["月間工数", "120h", "36h"], ["差し戻し", "30件", "3件"], ["締め日数", "8日", "3日"]] }
+    },
+    { "layout": "比較", "title": "プラン比較", "body": "スタンダード", "body2": ["月額 5 万円", "ユーザー 50 名まで"], "body3": "エンタープライズ", "body4": ["月額 15 万円", "ユーザー無制限", "SSO 対応"] },
+    { "layout": "section", "title": "導入スケジュール", "subtitle": "最短 2 か月で本番稼働" },
+    { "layout": 6, "title": "体制図", "elements": [
+      { "type": "shape", "shape": "roundRect", "x": "40%", "y": "35%", "w": "20%", "h": "12%", "text": "PMO", "fill": "accent1" },
+      { "type": "shape", "shape": "roundRect", "x": "15%", "y": "60%", "w": "20%", "h": "12%", "text": "開発チーム", "fill": "accent2" },
+      { "type": "shape", "shape": "roundRect", "x": "65%", "y": "60%", "w": "20%", "h": "12%", "text": "導入支援", "fill": "accent3" },
+      { "type": "line", "x": "50%", "y": "47%", "x2": "25%", "y2": "60%", "line": { "color": "tx1", "width": 1.5 } },
+      { "type": "line", "x": "50%", "y": "47%", "x2": "75%", "y2": "60%", "line": { "color": "tx1", "width": 1.5 } }
+    ] }
+  ]
+}

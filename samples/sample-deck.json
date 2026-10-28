@@ -1,0 +1,105 @@
+{
+  "assets": [
+    { "name": "logo", "path": "/PowerPoint/images/logo.png" },
+    { "name": "photo", "path": "/PowerPoint/images/image.png" }
+  ],
+  "output": { "folder": "/PowerPoint/output", "fileName": "月次報告_{{month}}_{timestamp}" },
+
+  "size": "16:9",
+  "unit": "cm",
+  "properties": { "title": "月次営業報告", "author": "営業企画部" },
+  "vars": {
+    "company": "サンプル株式会社",
+    "month": "2026年10月",
+    "regions": [
+      { "name": "東日本", "sales": 2210, "growth": "+8%" },
+      { "name": "西日本", "sales": 1730, "growth": "+3%" }
+    ]
+  },
+
+  "theme": {
+    "colors": { "accent1": "2563EB", "accent2": "0EA5A4", "accent3": "F59E0B", "dk2": "0F2A4A", "lt2": "E8EEF5" },
+    "fonts": { "major": "Aptos Display", "minor": "Aptos", "majorEa": "Yu Gothic", "minorEa": "Yu Gothic" }
+  },
+  "master": {
+    "background": "FFFFFF",
+    "titleStyle": { "size": 30, "color": "tx2", "bold": true },
+    "bodyStyle": { "size": 20, "color": "tx1", "bulletColor": "accent1" },
+    "titleBar": "accent1",
+    "logo": { "image": "logo", "position": "topRight", "h": 1.0 },
+    "layoutOptions": {
+      "title": { "background": { "gradient": ["dk2", "accent1"], "angle": 45 } }
+    }
+  },
+  "styles": {
+    "card": { "fill": "lt2", "line": "none", "radius": 8, "margin": 0.4, "valign": "middle", "align": "center", "size": 16 }
+  },
+
+  "footer": "{{company}} ｜ 社外秘",
+  "slideNumber": true,
+  "transition": "fade",
+
+  "slides": [
+    { "layout": "title", "title": "月次営業報告", "subtitle": "{{month}} ｜ 営業企画部", "section": "表紙" },
+
+    { "layout": "content", "title": "サマリー", "section": "本編",
+      "body": [
+        "売上高は **3,940 百万円**（前年比 +6%）",
+        ["東日本が全体をけん引", "西日本は新規顧客が増加"],
+        { "text": "粗利率は目標を 1.2pt 下回る", "color": "red", "bold": true },
+        "詳細は [社内ポータル](https://example.com) を参照"
+      ],
+      "notes": "サマリーは 3 点に絞って説明する" },
+
+    { "layout": "titleOnly", "title": "主要指標",
+      "elements": [
+        { "type": "shape", "shape": "roundRect", "style": "card", "x": 1.5,  "y": 4.5, "w": 9.8, "h": 5,
+          "text": [ { "text": "3,940", "size": 32, "bold": true, "color": "accent1" }, "売上高（百万円）" ] },
+        { "type": "shape", "shape": "roundRect", "style": "card", "x": 12.0, "y": 4.5, "w": 9.8, "h": 5,
+          "text": [ { "text": "28.4%", "size": 32, "bold": true, "color": "accent1" }, "粗利率" ] },
+        { "type": "shape", "shape": "roundRect", "style": "card", "x": 22.5, "y": 4.5, "w": 9.8, "h": 5,
+          "text": [ { "text": "152", "size": 32, "bold": true, "color": "accent1" }, "新規顧客（社）" ] },
+        { "type": "line", "x": 1.5, "y": 11.5, "x2": 32.3, "y2": 11.5, "line": { "color": "accent1", "width": 1.5, "dash": "dash" } },
+        { "type": "text", "x": 1.5, "y": 12, "w": 30.8, "h": 2, "text": "※ 速報値。確定値は翌月 10 日に更新します", "size": 12, "color": "tx1+40" }
+      ] },
+
+    { "layout": "twoContent", "title": "売上推移と内訳",
+      "left": { "type": "chart", "chartType": "column", "title": "月別売上（百万円）",
+        "data": [ { "月": "7月", "売上": 1180, "目標": 1200 }, { "月": "8月", "売上": 1250, "目標": 1250 },
+                  { "月": "9月", "売上": 1310, "目標": 1280 }, { "月": "10月", "売上": 1400, "目標": 1300 } ],
+        "dataLabels": true, "legend": "bottom", "numberFormat": "#,##0" },
+      "right": { "type": "chart", "chartType": "doughnut", "title": "カテゴリ別構成比",
+        "categories": ["PC", "周辺機器", "サービス"], "series": [ { "name": "構成比", "values": [52, 31, 17] } ],
+        "dataLabels": "percent", "legend": "right" } },
+
+    { "layout": "titleOnly", "title": "商品別の実績",
+      "elements": [
+        { "type": "table", "x": 1.5, "y": 4, "w": 30.8,
+          "columns": [
+            { "key": "name", "label": "商品", "width": 10 },
+            { "key": "qty", "label": "販売数", "format": "#,##0", "align": "right" },
+            { "key": "sales", "label": "売上（円）", "format": "¥#,##0", "align": "right" },
+            { "key": "rate", "label": "達成率", "format": "0.0%", "align": "right" }
+          ],
+          "data": [
+            { "name": "ノートPC", "qty": 128, "sales": 15360000, "rate": 1.08 },
+            { "name": "モニター 27型", "qty": 342, "sales": 10944000, "rate": 0.97 },
+            { "name": "ワイヤレスマウス", "qty": 905, "sales": 3167500, "rate": 1.12 },
+            { "name": "USB-C ドック", "qty": 210, "sales": 3360000, "rate": 0.89 },
+            { "name": "タブレット", "qty": 76, "sales": 6080000, "rate": 0.76 }
+          ],
+          "tableStyle": "medium2accent1", "headerFill": "dk2", "headerColor": "FFFFFF", "size": 14 }
+      ] },
+
+    { "each": "{{regions}}", "layout": "imageRight", "title": "{{index}}. {{name}}の状況",
+      "body": ["売上: {{sales}} 百万円", "前年比: {{growth}}"], "picture": "photo" },
+
+    { "layout": "comparison", "title": "来月の施策",
+      "leftHeading": "継続", "left": ["既存顧客への定期訪問", "保守契約の更新提案"],
+      "rightHeading": "新規", "right": ["Web セミナーの開催", "パートナー経由の販売"] },
+
+    { "layout": "quote", "quote": "数字の裏にあるお客様の声を、次の提案につなげよう。", "author": "営業本部長" },
+
+    { "layout": "closing", "title": "ご清聴ありがとうございました", "subtitle": "{{company}} 営業企画部" }
+  ]
+}
