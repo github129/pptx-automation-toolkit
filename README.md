@@ -21,8 +21,6 @@ Premium コネクタも外部サービスも使いません。Office Script の�
 ├─ scripts/
 │  ├─ BuildPptx.ts          入門: タイトル + 表 1 枚の PPTX を作る最小サンプル (約 260 行)
 │  └─ BuildDeck.ts          本格: PowerPoint 生成エンジン (かんたん / 詳細モード、テンプレート対応)
-├─ flows/
-│  └─ SampleFlow.zip        フロー「PowerPoint作成」のエクスポート (インポートして使う)
 ├─ templates/
 │  └─ スライド入力.xlsx     かんたんモードの入力シート (「Power Apps 概要」の見本入り)
 ├─ samples/
@@ -43,7 +41,7 @@ Premium コネクタも外部サービスも使いません。Office Script の�
 1. このリポジトリをダウンロード（**Code → Download ZIP**）
 2. OneDrive に `/PowerPoint/` フォルダーを作り、`スライド入力.xlsx`、`samples/images/*.png`（→ `/PowerPoint/images/`）、`samples/*.json`（→ `/PowerPoint/decks/`）をアップロード
 3. Excel for the web の **［自動化］→［新しいスクリプト］** に `scripts/BuildDeck.ts`（と `BuildPptx.ts`）を貼り付けて保存
-4. `flows/SampleFlow.zip` を Power Automate にインポートし、「スクリプトの実行」を自分の環境に合わせる（[手順](docs/flow-setup.md#2-1-サンプルフローをインポートする)）
+4. フロー「PowerPoint作成」を作成（作り方の動画: **準備中** / 手順: [docs/flow-setup.md](docs/flow-setup.md#2-本格フロー-powerpoint作成builddeck)）<!-- TODO: 作り方の動画の URL に差し替える -->
 5. フローを実行（ファイルのパス: `/PowerPoint/スライド入力.xlsx`）→ `/PowerPoint/output/` に PowerPoint が保存されます
 
 まずは仕組みを知りたい場合は、[入門フロー（BuildPptx）](docs/flow-setup.md#1-入門フロー-表-1-枚の-powerpointbuildpptx) から試すのがおすすめです。
