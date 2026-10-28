@@ -5,7 +5,7 @@
 
 - [0. 準備](#0-準備)
 - [1. 入門フロー: 表 1 枚の PowerPoint（BuildPptx）](#1-入門フロー-表-1-枚の-powerpointbuildpptx)
-- [2. 本格フロー: PowerPoint作成（BuildDeck）](#2-本格フロー-powerpoint作成builddeck)
+- [2. 本格フロー: PowerPoint作成（BuildDeck）](#2-本格フロー-powerpoint作成builddeck) — サンプルフロー（ZIP）あり
 - [3. よくあるエラー](#3-よくあるエラー)
 
 ---
@@ -58,56 +58,75 @@ OneDrive
 ## 2. 本格フロー: PowerPoint作成（BuildDeck）
 
 Excel（かんたんモード）と構成 JSON（かんたん / 詳細モード）のどちらからでも PowerPoint を作れるフローです。
+[`flows/SampleFlow.zip`](../flows/SampleFlow.zip) をインポートすればすぐに使えます。
+
+### 2-1. サンプルフローをインポートする
+
+1. Power Automate の **［マイ フロー］→［インポート］→［パッケージのインポート (レガシ)］** で `flows/SampleFlow.zip` をアップロード
+2. 「関連するリソース」で次のように設定して **［インポート］**
+   - フロー「PowerPoint作成」: **新規作成**
+   - Excel Online (Business) / OneDrive for Business の接続: **インポート中に選択** → 自分の接続を選ぶ
+3. インポートしたフローを編集し、**「必要なファイルを確認」と「PowerPointを生成」の 2 つ** の「スクリプトの実行」を自分の環境に合わせる
+   （配布用の ZIP では、OneDrive・スクリプトの ID を `REPLACE_WITH_…` というダミー値にしてあります）
+
+   | 項目 | 設定値 |
+   |---|---|
+   | 場所 | OneDrive for Business |
+   | ドキュメント ライブラリ | OneDrive |
+   | ファイル | 動的なコンテンツ `対象ブック`（変数） |
+   | スクリプト | `BuildDeck` |
+   | deckJson | `構成JSON`（変数） |
+   | templateBase64 | 「必要なファイルを確認」は空 / 「PowerPointを生成」は `テンプレート`（変数） |
+   | assetsJson | 「必要なファイルを確認」は空 / 「PowerPointを生成」は式 `string(variables('画像'))` |
+   | listFilesOnly | 「必要なファイルを確認」は **はい** / 「PowerPointを生成」は **いいえ** |
+
+   場所やライブラリを選び直すと下の項目が消えることがあります。その場合は上の表のとおりに入れ直してください。
+
+4. **構成 JSON（.json）も使う場合だけ**: 変数「変数_対象ブック」の値（ダミー値 `REPLACE_WITH_EXCEL_FILE_ID`）を、スクリプトを実行する Excel のファイル ID に変更する
+   （JSON 入力のときはブックの中身を読まないので、`/PowerPoint/スライド入力.xlsx` で構いません）。
+   ファイル ID は、一度 `ファイルのパス` に `/PowerPoint/スライド入力.xlsx` を指定して実行し、
+   実行履歴の「対象ブックを設定」に表示される値をコピーするのが簡単です。
+
+### 2-2. 実行する
+
+| 入力 | 内容 |
+|---|---|
+| ファイルのパス（必須） | Excel（例 `/PowerPoint/スライド入力.xlsx`）または構成 JSON（例 `/PowerPoint/decks/all-types.json`）の OneDrive パス |
+| テンプレートのパス（任意） | 社内テンプレート（.potx / .pptx）の OneDrive パス。空なら Excel の「設定」や JSON の `template` を使う |
+
+`保存先`（既定 `/PowerPoint/output`）に PowerPoint が保存されます。最後の「結果」アクションで、保存先・スライド数・警告を確認できます。
+
+### 2-3. フローの中身
+
 スクリプトを **2 回** 呼ぶのがポイントです。
 
-1. 1 回目（`listFilesOnly = true`）: 使う画像とテンプレートのパスを調べる
+1. 1 回目（`listFilesOnly = はい`）: 使う画像とテンプレートのパスを調べる
 2. フローが OneDrive からそれらのファイルを取得して Base64 で集める
 3. 2 回目: 画像・テンプレートを渡して PPTX を生成する
 
-```
-[トリガー: 構成JSONのパス (空なら Excel)]
-  ├─ 変数の初期化 deckJson / assets / templateBase64
-  ├─ 条件: パスが空でない → 構成JSONの取得 → deckJson に設定
-  ├─ スクリプトの実行 (ファイル一覧)  listFilesOnly = はい
-  ├─ Apply to each (files) → 画像の取得 → assets に追加
-  ├─ 条件: template が空でない → テンプレートの取得 → templateBase64 に設定
-  ├─ スクリプトの実行 (PPTX生成)
-  └─ ファイルの作成 (OneDrive)
-```
+| # | アクション名 | 種類 | 内容 |
+|---|---|---|---|
+| 1 | 手動でフローをトリガーします | トリガー | 入力 `ファイルのパス`（`text`）と `テンプレートのパス`（`text_1`） |
+| 2 | 変数_対象ブック / 変数_構成JSON / 変数_テンプレート / 変数_画像 | 変数を初期化する | 文字列 / 文字列 / 文字列 / アレイ |
+| 3 | JSONファイルか | 条件 | `ファイルのパス` が `.json` で終わるか |
+| 3-はい | JSONを取得 → 構成JSONを設定 | パスを使用したファイル コンテンツの取得 → 変数の設定 | JSON の中身を `構成JSON` に入れる |
+| 3-いいえ | Excelの情報を取得 → 対象ブックを設定 | パスによるファイル メタデータの取得 → 変数の設定 | 指定した Excel の ID を `対象ブック` に入れる |
+| 4 | 必要なファイルを確認 | スクリプトの実行 | 1 回目（`listFilesOnly = はい`） |
+| 5 | テンプレートのパス | 作成 | トリガーの入力を優先し、空ならスクリプトが返した `template` |
+| 6 | テンプレートあり → テンプレートを取得 → テンプレートを設定 | 条件 → ファイル コンテンツの取得 → 変数の設定 | テンプレートを Base64 で `テンプレート` に入れる |
+| 7 | 画像ごとに取得 → 画像を取得 → 画像を追加 | Apply to each → ファイル コンテンツの取得 → 配列変数に追加 | `{ "name", "data" }` を `画像` に追加（同時実行は 1） |
+| 8 | PowerPointを生成 | スクリプトの実行 | 2 回目 |
+| 9 | OneDriveに保存 | ファイルの作成 | `{timestamp}` を日本時間に置き換えて `.pptx` で保存 |
+| 10 | 結果 | 作成 | 保存先・スライド数・警告 |
 
-### 手順
-
-アクション名は式の中で参照するため、表の **名前** のとおりに変更してください（名前の変更は各アクションの「…」→「名前の変更」）。
-
-| # | アクション（名前） | 設定 |
-|---|---|---|
-| 1 | **手動でフローをトリガーします** | テキスト入力を 1 つ追加: `構成JSONのパス`（任意。例 `/PowerPoint/decks/all-types.json`。空なら Excel を読む） |
-| 2 | **変数を初期化する** | 名前 `deckJson` / 種類 文字列 / 値 なし |
-| 3 | **変数を初期化する** | 名前 `assets` / 種類 アレイ / 値 `[]` |
-| 4 | **変数を初期化する** | 名前 `templateBase64` / 種類 文字列 / 値 なし |
-| 5 | **条件** | `triggerBody()?['text']` が `次の値に等しくない`（空） |
-| 5-はい-1 | OneDrive for Business **パスを使用したファイル コンテンツの取得**（`構成JSONの取得`） | ファイル パス: `triggerBody()?['text']`<br>詳細パラメーター「コンテンツ タイプの推測」: **いいえ** |
-| 5-はい-2 | **変数の設定** | `deckJson` = `base64ToString(body('構成JSONの取得')?['$content'])` |
-| 6 | Excel Online (Business) **スクリプトの実行**（`ファイル一覧`） | ファイル: `/PowerPoint/スライド入力.xlsx` / スクリプト: `BuildDeck`<br>deckJson: `variables('deckJson')`<br>listFilesOnly: **はい** |
-| 7 | **Apply to each**（`画像ごと`） | 出力の選択: `outputs('ファイル一覧')?['body/result/files']` |
-| 7-1 | OneDrive for Business **パスを使用したファイル コンテンツの取得**（`画像の取得`） | ファイル パス: `items('画像ごと')?['path']`<br>「コンテンツ タイプの推測」: **いいえ** |
-| 7-2 | **配列変数に追加** | `assets` に `{"name": "@{items('画像ごと')?['name']}", "data": "@{body('画像の取得')?['$content']}"}` |
-| 8 | **条件** | `outputs('ファイル一覧')?['body/result/template']` が `次の値に等しくない`（空） |
-| 8-はい-1 | OneDrive for Business **パスを使用したファイル コンテンツの取得**（`テンプレートの取得`） | ファイル パス: `outputs('ファイル一覧')?['body/result/template']`<br>「コンテンツ タイプの推測」: **いいえ** |
-| 8-はい-2 | **変数の設定** | `templateBase64` = `body('テンプレートの取得')?['$content']` |
-| 9 | Excel Online (Business) **スクリプトの実行**（`PPTX生成`） | ファイル: `/PowerPoint/スライド入力.xlsx` / スクリプト: `BuildDeck`<br>deckJson: `variables('deckJson')`<br>templateBase64: `variables('templateBase64')`<br>assetsJson: `string(variables('assets'))`<br>listFilesOnly: **いいえ** |
-| 10 | OneDrive for Business **ファイルの作成** | フォルダーのパス: `outputs('PPTX生成')?['body/result/folder']`<br>ファイル名: 下記の式<br>ファイル コンテンツ: `base64ToBinary(outputs('PPTX生成')?['body/result/base64'])` |
-| 11 | （任意）**作成**（`結果`） | `outputs('PPTX生成')?['body/result/warnings']` と `['layouts']` を表示。警告や、テンプレートのレイアウト一覧を確認できます |
-
-手順 10 のファイル名（`{timestamp}` を日本時間の `yyyyMMdd_HHmmss` に置き換える）:
+主な式:
 
 ```
-concat(replace(outputs('PPTX生成')?['body/result/fileName'], '{timestamp}', convertFromUtc(utcNow(), 'Tokyo Standard Time', 'yyyyMMdd_HHmmss')), '.pptx')
+構成JSONを設定:  if(contains(string(body('JSONを取得')), '$content-type'), base64ToString(body('JSONを取得')?['$content']), string(body('JSONを取得')))
+対象ブックを設定: last(split(body('Excelの情報を取得')?['Id'], '.'))
+OneDriveに保存 (ファイル名):  @{replace(body('PowerPointを生成')?['result']?['fileName'], '{timestamp}', formatDateTime(convertFromUtc(utcNow(), 'Tokyo Standard Time'), 'yyyyMMdd_HHmmss'))}.pptx
+OneDriveに保存 (コンテンツ):  base64ToBinary(body('PowerPointを生成')?['result']?['base64'])
 ```
-
-> - Apply to each の **同時実行制御はオフ（既定）のまま** にしてください。オンにすると配列変数への追加が不安定になります。
-> - 7-2 の `name` には、スクリプトが返した名前（かんたんモードではパスそのもの、詳細モードでは `assets` の `name`）をそのまま使います。
-> - スクリプトを実行するブックは何でも構いません。構成 JSON を渡したときは、ブックの中身は読みません。
 
 ### スクリプトの戻り値
 
@@ -124,7 +143,7 @@ concat(replace(outputs('PPTX生成')?['body/result/fileName'], '{timestamp}', co
 ### 応用
 
 - **JSON を置いたら自動生成**: トリガーを OneDrive for Business「ファイルが作成されたとき」（フォルダー `/PowerPoint/decks`）に替え、
-  `構成JSONの取得` を「ファイル コンテンツの取得」（ファイル識別子 = トリガーの `x-ms-file-id`）にします。
+  `ファイルのパス` の代わりにトリガーのファイル パスを使います。
 - **他システムのデータを流し込む**: 詳細は [DeckSpec.md §12](DeckSpec.md#12-他のフローからデータを流し込むには)。
 
 ---
@@ -133,9 +152,10 @@ concat(replace(outputs('PPTX生成')?['body/result/fileName'], '{timestamp}', co
 
 | 症状 | 原因と対処 |
 |---|---|
-| `ブックに「スライド」シートが見つかりません` | 構成 JSON のパスが空で、実行対象のブックが `スライド入力.xlsx` ではない |
+| `ブックに「スライド」シートが見つかりません` | `ファイルのパス` に指定した Excel に「スライド」シートがない |
+| スクリプトの実行で「ファイルが見つかりません」 | インポート後に「スクリプトの実行」の場所・スクリプトを選び直していない（[2-1](#2-1-サンプルフローをインポートする) の手順 3）、または JSON 入力で「変数_対象ブック」を変更していない（手順 4） |
 | `JSON` の解析エラー | 構成 JSON の文法ミス（末尾のカンマ、`"` の閉じ忘れなど）。VS Code などで確認してください |
 | 画像が表示されない | `images` に置いたパスと、Excel / JSON に書いたパスが一致しているか確認 |
 | `レイアウト「…」が見つかりません` | テンプレートのレイアウト名と違う。エラーに出る「使用可能」の名前かキー（`content` など）を使う |
 | タイムアウト | 「スクリプトの実行」は 1 回 120 秒まで。スライド枚数・画像サイズを減らす |
-| 生成した PPTX が開けない | 手順 10 のファイル コンテンツが `base64ToBinary(...)` になっているか確認 |
+| 生成した PPTX が開けない | 「OneDriveに保存」のファイル コンテンツが `base64ToBinary(...)` になっているか確認 |
