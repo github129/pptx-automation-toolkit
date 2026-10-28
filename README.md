@@ -22,9 +22,9 @@ Premium コネクタも外部サービスも使いません。Office Script の�
 │  ├─ BuildPptx.ts          入門: タイトル + 表 1 枚の PPTX を作る最小サンプル (約 260 行)
 │  └─ BuildDeck.ts          本格: PowerPoint 生成エンジン (かんたん / 詳細モード、テンプレート対応)
 ├─ templates/
-│  └─ スライド入力.xlsx     かんたんモードの入力シート (全種類の見本入り)
+│  └─ スライド入力.xlsx     かんたんモードの入力シート (「Power Apps 概要」の見本入り)
 ├─ samples/
-│  ├─ all-types.json        かんたんモード: 全 21 種類の見本 (Excel と同じ内容)
+│  ├─ all-types.json        かんたんモード: 全 21 種類の見本
 │  ├─ simple-deck.json      かんたんモード: 最小の例
 │  ├─ sample-deck.json      詳細モード: 組み込みデザインで主要機能を使う例
 │  ├─ template-deck.json    詳細モード: 社内テンプレートを使う例
@@ -33,7 +33,7 @@ Premium コネクタも外部サービスも使いません。Office Script の�
 ├─ docs/
 │  ├─ flow-setup.md         Power Automate フローの作り方
 │  └─ DeckSpec.md           入力の書き方 (かんたんモード / 構成 JSON リファレンス)
-└─ tools/                   ローカル動作確認・Excel 再生成用 (配布先での利用は任意)
+└─ tools/                   ローカル動作確認用 (配布先での利用は任意)
 ```
 
 ## はじめ方
@@ -84,4 +84,3 @@ npm run build:all-types
 
 `out/` に PowerPoint が出力されます。ほかのサンプルは `build:simple` / `build:sample` / `build:table`、
 任意の JSON は `node tools/build-local.js <構成JSON> [--template <.pptx>]` で試せます。
-`templates/スライド入力.xlsx` は `python3 tools/make-input-xlsx.py`（要 openpyxl）で `samples/all-types.json` から作り直せます。
